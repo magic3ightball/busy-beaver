@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>직접 해 보기 · 시안</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #ffffff; --fg: #141414; --fg2: #3d3d3d; --muted: #8a8a8a; --line: #e8e8e8; --soft: #f7f7f5;
+  --accent: #ff5a1f; --hl: #ffe6d9; --blue: #635bff; --hlb: #e7e5ff; --cell0: #f1f1f1; --cell1: #141414;
+  --good: #12a150; --goodbg: #e2f6ea; --bad: #d93a2b; --badbg: #fde7e4;
+  --sans: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", system-ui, sans-serif;
+  --mono: "Geist Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #0d0d0d; --fg: #ececec; --fg2: #c4c4c4; --muted: #8a8a8a; --line: #242424; --soft: #151515;
+    --hl: #3a2216; --hlb: #23214a; --cell0: #222222; --cell1: #ececec; --goodbg: #10301d; --badbg: #3a1714; }
+}
+:root[data-theme="dark"] { --bg: #0d0d0d; --fg: #ececec; --fg2: #c4c4c4; --muted: #8a8a8a; --line: #242424; --soft: #151515;
+  --hl: #3a2216; --hlb: #23214a; --cell0: #222222; --cell1: #ececec; --goodbg: #10301d; --badbg: #3a1714; }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.75 var(--sans); -webkit-font-smoothing: antialiased; word-break: keep-all; }
+.page { max-width: 760px; margin: 0 auto; padding: 0 20px 120px; }
+.top { display: flex; justify-content: space-between; align-items: center; height: 60px; border-bottom: 1px solid var(--line); font-size: .88rem; color: var(--muted); margin-bottom: 48px; }
+.top b { color: var(--fg); }
+.kicker { font: 500 .78rem var(--mono); color: var(--accent); margin: 0 0 10px; }
+h1 { font-size: 2.2rem; line-height: 1.2; letter-spacing: -.035em; margin: 0 0 12px; }
+h2 { font-size: 1.5rem; letter-spacing: -.03em; margin: 72px 0 6px; }
+h2 small { display: block; font: 500 .78rem var(--mono); color: var(--muted); margin-bottom: 8px; }
+p { color: var(--fg2); margin: 12px 0; }
+b { color: var(--fg); }
+code { font: .85em var(--mono); background: var(--soft); padding: 1px 6px; border-radius: 5px; }
+.mocknote { font-size: .85rem; color: var(--muted); background: var(--soft); border-radius: 10px; padding: 10px 14px; }
+.widget { margin: 24px 0; border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
+button { font: 600 .88rem var(--sans); height: 38px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); cursor: pointer; }
+button.pri { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+button:disabled { opacity: .4; cursor: default; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+/* levels */
+.levels { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; scrollbar-width: none; }
+.levels button { flex: none; height: 34px; padding: 0 12px; font-size: .8rem; font-weight: 600; }
+.levels button.on { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.levels button .st { color: var(--accent); margin-left: 4px; }
+.goal { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.goal h3 { margin: 0; font-size: 1.15rem; letter-spacing: -.02em; }
+.goal span { font: .78rem var(--mono); color: var(--muted); }
+
+/* rule table */
+.table { display: grid; grid-template-columns: 34px 1fr 1fr; gap: 8px; margin: 16px 0; align-items: center; }
+.table .h { font: .72rem var(--mono); color: var(--muted); text-align: center; }
+.table .q { font: 700 1rem var(--mono); text-align: center; }
+.cell { display: flex; gap: 4px; background: var(--soft); border-radius: 12px; padding: 6px; transition: box-shadow .15s; }
+.cell.on { box-shadow: 0 0 0 2px var(--accent); }
+.cell button { flex: 1; min-width: 0; height: 40px; padding: 0; border-radius: 9px; font: 600 .95rem var(--mono); background: var(--bg); }
+.cell button.halt { background: var(--accent); color: #fff; border-color: var(--accent); font-family: var(--sans); font-size: .8rem; }
+.cell button.one { background: var(--cell1); color: var(--bg); border-color: var(--cell1); }
+.legend { font-size: .8rem; color: var(--muted); margin: -6px 0 14px; }
+
+/* run area */
+.tape { display: grid; grid-template-columns: repeat(15, 1fr); gap: 3px; margin: 14px 0 4px; }
+.tape span { aspect-ratio: 1; border-radius: 5px; background: var(--cell0); }
+.tape span.one { background: var(--cell1); }
+.tape span.hd { box-shadow: 0 0 0 2px var(--accent); }
+canvas { width: 100%; display: block; border-radius: 10px; background: var(--soft); image-rendering: pixelated; }
+.stats { display: flex; gap: 18px; font: .82rem var(--mono); color: var(--muted); margin: 10px 0 0; }
+.stats b { font-size: 1.05rem; }
+.msg { margin: 14px 0 0; padding: 12px 14px; border-radius: 12px; background: var(--soft); font-size: .95rem; color: var(--fg); min-height: 3em; }
+.msg.good { background: var(--goodbg); }
+.msg.bad { background: var(--badbg); }
+.meter { height: 8px; border-radius: 99px; background: var(--cell0); overflow: hidden; margin-top: 12px; position: relative; }
+.meter i { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 99px; transition: width .2s; }
+
+/* quiz */
+.qhead { display: flex; justify-content: space-between; font: .78rem var(--mono); color: var(--muted); margin-bottom: 10px; }
+.qtm { font: .76rem var(--mono); color: var(--muted); overflow-wrap: anywhere; margin: 8px 0 12px; }
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+.choices button { height: 52px; font-size: 1rem; border-radius: 14px; }
+.pics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pics figure { margin: 0; }
+.pics figcaption { font: .72rem var(--mono); color: var(--muted); margin-top: 4px; }
+.verdict { font-weight: 700; font-size: 1.05rem; margin: 0 0 4px; }
+.dots { display: flex; gap: 5px; }
+.dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--cell0); }
+.dots i.g { background: var(--good); } .dots i.b { background: var(--bad); } .dots i.u { background: var(--blue); } .dots i.c { box-shadow: 0 0 0 2px var(--fg); }
+@media (max-width: 520px) {
+  h1 { font-size: 1.8rem; } body { font-size: 16px; }
+  .widget { padding: 14px; }
+  .cell button { height: 38px; font-size: .85rem; }
+  .pics { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="top"><span><b>Busy Beaver</b> 연구 노트</span><span>시안 · 직접 해 보기</span></div>
+<p class="kicker">새 섹션 시안</p>
+<h1>직접 해 보기</h1>
+<p>읽기만 하지 말고 직접 손으로 해 봐요. 두 가지 놀이가 있어요.</p>
+<p class="mocknote">시안이에요. 마음에 들면 이 모양 그대로 노트의 새 섹션(02 시뮬레이터 바로 뒤)으로 넣을게요.</p>
+
+<h2><small>놀이 1</small>비버 조련사: 최대한 오래 일하고 멈추는 기계 만들기</h2>
+<p>규칙표의 칸을 눌러 바꿔 보세요. 각 칸은 <b>쓸 기호 · 갈 방향 · 다음 상태</b> 순서예요. 목표는 <b>멈추긴 멈추되, 최대한 늦게</b> 멈추는 기계. 영원히 도는 기계는 점수가 없어요.</p>
+<div class="widget" id="g1">
+  <div class="levels" id="g1-levels"></div>
+  <div class="goal"><h3 id="g1-title"></h3><span id="g1-best"></span></div>
+  <div class="table" id="g1-table"></div>
+  <p class="legend">칸 = <b>쓸 기호</b> · <b>방향</b>(← →) · <b>다음 상태</b>(주황 = 멈춤). 기계는 상태 A, 빈 테이프(전부 0)에서 시작해요.</p>
+  <div class="row">
+    <button class="pri" id="g1-run">▶ 돌려 보기</button>
+    <button id="g1-hint">힌트</button>
+    <button id="g1-champ">챔피언 보기</button>
+  </div>
+  <div class="tape" id="g1-tape"></div>
+  <canvas id="g1-cv" width="600" height="220"></canvas>
+  <div class="stats"><span>걸음 <b id="g1-steps">0</b></span><span>남은 1 <b id="g1-ones">0</b></span><span>목표 <b id="g1-target">0</b></span></div>
+  <div class="meter"><i id="g1-meter" style="width:0"></i></div>
+  <div class="msg" id="g1-msg">칸을 눌러 규칙을 바꾸고 <b>돌려 보기</b>를 누르세요.</div>
+</div>
+
+<h2><small>놀이 2</small>멈출까, 안 멈출까?</h2>
+<p>기계가 움직인 처음 모습만 보고 맞혀 보세요. 위에서 아래로 시간, 가로는 테이프예요. 이 노트의 판정기들이 실제로 한 일이 바로 이거예요. 함정 문제도 있어요.</p>
+<div class="widget" id="g2">
+  <div class="qhead"><span id="g2-num"></span><span class="dots" id="g2-dots"></span></div>
+  <div class="pics" id="g2-pics"><figure><canvas id="g2-cv1" width="300" height="300"></canvas><figcaption id="g2-cap1"></figcaption></figure></div>
+  <div class="qtm" id="g2-tm"></div>
+  <div class="choices" id="g2-choices">
+    <button data-a="halt">언젠가 멈춘다</button>
+    <button data-a="never">영원히 안 멈춘다</button>
+  </div>
+  <div class="msg" id="g2-msg" hidden></div>
+  <div class="row" style="margin-top:12px"><button class="pri" id="g2-next" hidden>다음 문제 →</button></div>
+</div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const L = String.fromCharCode;
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* private mode */ } },
+  };
+
+  // rules[s][sym] = {w, d: +1|-1, n: state index or -1 for halt}
+  function parse(tm) {
+    return tm.split("_").map(seg => {
+      const out = [];
+      for (let i = 0; i < seg.length; i += 3) {
+        const c = seg.slice(i, i + 3);
+        if (c[0] === "-") { out.push({ w: 1, d: 1, n: -1 }); continue; }
+        const q = c.charCodeAt(2) - 65;
+        out.push({ w: +c[0], d: c[1] === "R" ? 1 : -1, n: q < tm.split("_").length ? q : -1 });
+      }
+      return out;
+    });
+  }
+  // Run up to `limit` steps, keeping up to `rowsMax` evenly spaced tape rows for the picture.
+  // dense: keep every step for the first rowsMax steps (short runs); else spread rows over `limit`.
+  function run(rules, limit, rowsMax, dense) {
+    const tape = new Map(); let h = 0, s = 0, step = 0, lo = 0, hi = 0, ones = 0;
+    const every = dense ? 1 : Math.max(1, Math.ceil(limit / rowsMax)), rows = [];
+    const seen = new Map(); let cycle = 0, runaway = 0;
+    const snap = () => rows.push({ h, t: new Map(tape) });
+    snap();
+    while (step < limit) {
+      const r = rules[s][tape.get(h) || 0];
+      const old = tape.get(h) || 0;
+      if (r.w !== old) { ones += r.w ? 1 : -1; if (r.w) tape.set(h, r.w); else tape.delete(h); }
+      h += r.d; step++;
+      if (h < lo) { lo = h; runaway++; } else if (h > hi) { hi = h; runaway++; } else runaway = 0;
+      if (r.n < 0) { snap(); return { halted: true, step, ones, rows, lo, hi, h }; }
+      s = r.n;
+      if (step % every === 0 && rows.length < rowsMax) snap();
+      if (step <= 3000 && !cycle) {
+        let key = s + "|" + h + "|";
+        for (let x = lo; x <= hi; x++) key += tape.get(x) || 0;
+        if (seen.has(key)) cycle = step - seen.get(key); else seen.set(key, step);
+      }
+    }
+    return { halted: false, step, ones, rows, lo, hi, h, s, cycle, runaway: runaway > 200 };
+  }
+  function draw(cv, res, maxW) {
+    const ctx = cv.getContext("2d");
+    const lo = Math.min(res.lo, ...res.rows.map(r => r.h)) - 1, hi = Math.max(res.hi, ...res.rows.map(r => r.h)) + 1;
+    const cols = hi - lo + 1, n = res.rows.length;
+    const cw = Math.max(1, Math.min(14, Math.floor(maxW / cols)));
+    const ch = Math.max(1, Math.min(14, Math.floor(320 / n)));
+    cv.width = cols * cw; cv.height = n * ch;
+    ctx.fillStyle = css("--soft"); ctx.fillRect(0, 0, cv.width, cv.height);
+    const c1 = css("--cell1"), ac = css("--accent"), sym = ["", c1, "#ff9a6b", "#635bff", "#12a150"];
+    res.rows.forEach((r, y) => {
+      for (const [x, v] of r.t) { ctx.fillStyle = sym[v] || c1; ctx.fillRect((x - lo) * cw, y * ch, cw, ch); }
+      ctx.fillStyle = ac; ctx.fillRect((r.h - lo) * cw, y * ch, cw, ch);
+    });
+  }
+
+  // ------------------------------------------------------------------ game 1
+  const LEVELS = [
+    { n: 2, target: 4, title: "상태 2개로 4걸음 넘기기",
+      hint: "처음엔 상태 A가 0을 읽어요. 그 칸(A·0)에 '멈춤'이 있으면 1걸음 만에 끝나요. 멈춤은 나중에 쓰일 칸으로 옮겨 보세요." },
+    { n: 2, target: 6, champ: "1RB1LB_1LA1RZ", title: "상태 2개 챔피언 따라잡기",
+      hint: "멈춤은 딱 한 칸에만 두고, 나머지 칸은 A와 B가 서로를 부르게 해 보세요. 왼쪽·오른쪽을 섞으면 헤드가 지그재그해요." },
+    { n: 3, target: 14, title: "상태 3개로 14걸음 넘기기",
+      hint: "헤드가 한쪽으로만 달리면 금방 끝나거나 영원히 가요. 1을 만나면 방향을 바꾸게 해 보세요." },
+    { n: 3, target: 21, champ: "1RB1RZ_1LB0RC_1LC1LA", title: "상태 3개 챔피언 따라잡기",
+      hint: "챔피언은 한 상태가 자기 자신을 다시 부르는 규칙(예: B가 1을 읽으면 다시 B)을 써요. 그 상태로 1이 이어진 구간을 쭉 훑고 지나가요." },
+    { n: 4, target: 50, title: "상태 4개로 50걸음 넘기기",
+      hint: "테이프 양 끝을 오가는 '바운서'를 만들어 보세요. 한 번 갈 때마다 조금씩 멀리 가면 걸음이 빨리 늘어요." },
+    { n: 4, target: 107, champ: "1RB1LB_1LA0LC_1RZ1LD_1RD0RA", title: "상태 4개 챔피언 따라잡기",
+      hint: "챔피언은 0을 다시 쓰기도 해요(1을 지우기). 지웠다 썼다 하면 같은 칸을 여러 번 지나가요." },
+  ];
+  const LIMIT1 = 5000;
+  let lv = 0, rules = null, anim = null, champLoaded = false;
+  const best = store.get("bb-play-best", {});
+  const fresh = n => Array.from({ length: n }, () => [{ w: 1, d: 1, n: -1 }, { w: 1, d: 1, n: -1 }]);
+  const drafts = {};
+
+  function levelBar() {
+    $("g1-levels").innerHTML = LEVELS.map((L_, i) =>
+      `<button class="${i === lv ? "on" : ""}" data-i="${i}">${i + 1}단계${(best[i] || 0) >= L_.target ? '<span class="st">★</span>' : ""}</button>`).join("");
+    $("g1-levels").querySelectorAll("button").forEach(b => b.onclick = () => setLevel(+b.dataset.i));
+  }
+  function setLevel(i) {
+    stopAnim();
+    lv = i; const Lv = LEVELS[i];
+    rules = drafts[i] || (drafts[i] = fresh(Lv.n));
+    champLoaded = false;
+    $("g1-title").textContent = Lv.title;
+    $("g1-target").textContent = Lv.target;
+    $("g1-best").textContent = best[i] ? `내 기록 ${best[i]}걸음` : "아직 기록 없음";
+    $("g1-champ").hidden = !Lv.champ;
+    $("g1-msg").className = "msg"; $("g1-msg").innerHTML = "칸을 눌러 규칙을 바꾸고 <b>돌려 보기</b>를 누르세요.";
+    $("g1-steps").textContent = 0; $("g1-ones").textContent = 0; $("g1-meter").style.width = "0";
+    levelBar(); table(); tapeStrip(new Map(), 0);
+    const cv = $("g1-cv"); cv.width = 600; cv.height = 80; const c = cv.getContext("2d"); c.fillStyle = css("--soft"); c.fillRect(0, 0, 600, 80);
+  }
+  function table(active) {
+    const n = rules.length;
+    let h = '<div></div><div class="h">0을 읽으면</div><div class="h">1을 읽으면</div>';
+    for (let s = 0; s < n; s++) {
+      h += `<div class="q">${L(65 + s)}</div>`;
+      for (let k = 0; k < 2; k++) {
+        const r = rules[s][k], on = active && active[0] === s && active[1] === k;
+        h += `<div class="cell ${on ? "on" : ""}">` +
+          `<button data-s="${s}" data-k="${k}" data-f="w" class="${r.w ? "one" : ""}" aria-label="쓸 기호">${r.w}</button>` +
+          `<button data-s="${s}" data-k="${k}" data-f="d" aria-label="방향">${r.d > 0 ? "→" : "←"}</button>` +
+          `<button data-s="${s}" data-k="${k}" data-f="n" class="${r.n < 0 ? "halt" : ""}" aria-label="다음 상태">${r.n < 0 ? "멈춤" : L(65 + r.n)}</button></div>`;
+      }
+    }
+    $("g1-table").innerHTML = h;
+    $("g1-table").querySelectorAll("button").forEach(b => b.onclick = () => {
+      stopAnim();
+      champLoaded = false;
+      const r = rules[+b.dataset.s][+b.dataset.k];
+      if (b.dataset.f === "w") r.w ^= 1;
+      else if (b.dataset.f === "d") r.d = -r.d;
+      else r.n = r.n + 1 >= n ? -1 : r.n + 1;          // A → B → … → 멈춤 → A
+      table();
+    });
+  }
+  function tapeStrip(t, h) {
+    let s = "";
+    for (let x = h - 7; x <= h + 7; x++) s += `<span class="${t.get(x) ? "one" : ""} ${x === h ? "hd" : ""}"></span>`;
+    $("g1-tape").innerHTML = s;
+  }
+  function stopAnim() { if (anim) cancelAnimationFrame(anim); anim = null; $("g1-run").disabled = false; }
+
+  $("g1-run").onclick = () => {
+    stopAnim();
+    const Lv = LEVELS[lv];
+    const res = run(rules, LIMIT1, 400, true);
+    // replay the run row by row so the picture grows
+    const all = res, total = res.rows.length;
+    let shown = 1;
+    $("g1-run").disabled = true;
+    const tick = () => {
+      shown = Math.min(total, shown + Math.max(1, Math.ceil(total / 90)));
+      const part = { ...all, rows: all.rows.slice(0, shown) };
+      draw($("g1-cv"), part, Math.min(680, $("g1").clientWidth - 30));
+      const last = part.rows[part.rows.length - 1];
+      tapeStrip(last.t, last.h);
+      const stepNow = shown >= total ? res.step : Math.round(res.step * shown / total);
+      $("g1-steps").textContent = stepNow.toLocaleString();
+      $("g1-meter").style.width = Math.min(100, 100 * stepNow / Lv.target) + "%";
+      if (shown < total) { anim = requestAnimationFrame(tick); return; }
+      anim = null; $("g1-run").disabled = false;
+      $("g1-ones").textContent = res.ones;
+      finish(res);
+    };
+    anim = requestAnimationFrame(tick);
+  };
+  function finish(res) {
+    const Lv = LEVELS[lv], msg = $("g1-msg");
+    if (!res.halted) {
+      msg.className = "msg bad";
+      msg.innerHTML = res.cycle
+        ? `<b>영원히 돌아요.</b> ${res.cycle}걸음마다 테이프·헤드·상태가 똑같아져서 절대 안 멈춰요. 멈추지 않는 기계는 기록이 안 돼요.`
+        : res.runaway
+          ? `<b>헤드가 한쪽으로 끝없이 달려가요.</b> 빈칸만 계속 만나니 영원히 안 멈춰요. 빈칸(0)을 읽을 때 방향이 바뀌게 해 보세요.`
+          : `<b>${LIMIT1.toLocaleString()}걸음이 지나도 안 멈췄어요.</b> 아마 영원히 도는 기계예요. 이 놀이에서 목표는 10~100걸음대예요.`;
+      return;
+    }
+    const st = res.step;
+    if (!champLoaded && st > (best[lv] || 0)) { best[lv] = st; store.set("bb-play-best", best); }
+    $("g1-best").textContent = best[lv] ? `내 기록 ${best[lv]}걸음` : "아직 기록 없음";
+    levelBar();
+    if (st >= Lv.target) {
+      msg.className = "msg good";
+      msg.innerHTML = Lv.champ && st >= Lv.target
+        ? `<b>챔피언과 같아요! ${st}걸음.</b> 상태 ${Lv.n}개로는 이게 최대라는 게 수학적으로 증명돼 있어요. 더 길게 만들 방법은 없어요.`
+        : `<b>성공! ${st}걸음 만에 멈췄어요.</b> 목표 ${Lv.target}걸음을 넘었어요. 다음 단계로 가 보세요.`;
+    } else {
+      msg.className = "msg";
+      msg.innerHTML = `<b>${st}걸음 만에 멈췄어요.</b> 목표까지 ${Lv.target - st}걸음 더. ` +
+        (st <= 1 ? "첫 걸음에 바로 멈췄네요. 힌트를 눌러 보세요." : "멈춤 칸이나 방향을 하나씩 바꿔 보세요.");
+    }
+  }
+  $("g1-hint").onclick = () => { const m = $("g1-msg"); m.className = "msg"; m.innerHTML = "<b>힌트</b> " + LEVELS[lv].hint; };
+  $("g1-champ").onclick = () => {
+    const Lv = LEVELS[lv]; if (!Lv.champ) return;
+    rules = drafts[lv] = parse(Lv.champ);
+    table();
+    const m = $("g1-msg"); m.className = "msg";
+    m.innerHTML = `챔피언 규칙을 채웠어요 (<code>${Lv.champ}</code>). <b>돌려 보기</b>로 확인해 보세요. 기록에는 안 남아요.`;
+    champLoaded = true;
+  };
+  setLevel(0);
+
+  // ------------------------------------------------------------------ game 2
+  // tm, steps shown, answer, explanation, steps for the reveal picture
+  const Q = [
+    ["1RB1LB_1LA0LC_1RZ1LD_1RD0RA", 50, "halt", "멈춰요! 107걸음 만에. 상태 4개짜리 챔피언(BB(4))이에요.", 107],
+    ["1RB0LD_1LA1RD_0LD1RZ_1RA0LA", 120, "never", "영원히 안 멈춰요. 같은 무늬가 옆으로 옮겨 가며 반복하는 '평행이동 순환'이에요.", 600],
+    ["1RB1LC_1RC1RB_1RD0LE_1LA1LD_1RZ0LA", 3000, "halt", "함정! 멈추긴 해요. 하지만 47,176,870걸음 뒤에요. BB(5) 챔피언이고, 이 숫자가 최대라는 게 2024년에 증명됐어요.", 200000],
+    ["1RB3RA2LB---1RA_2LA4LB1RB4LA1RB", 3000, "never", "영원히 안 멈춰요. 이 노트의 바운서 판정기가 증명했어요: 4가 x개 있는 모양이 4가 x+2개인 같은 모양으로 돌아와요.", 60000],
+    ["1RB1LC_0LA1RC_0RB0LD_1LB1RZ", 20, "halt", "멈춰요! 32걸음 만에. 짧은 그림만 보면 헷갈리죠.", 32],
+    ["1RB1RA_0LC1LE_1LD1LC_1LA0LB_1LF1RE_---0RA", 3000, "unknown", "정답은 '아무도 몰라요'. Antihydra라는 크립티드예요. 멈출지 알아내려면 콜라츠 문제와 닮은 수학 난제를 풀어야 해요.", 60000],
+    ["1RB1RC_1LA1RA_0RB1LC", 30, "never", "영원히 안 멈춰요. 몇십 걸음 뒤부터 6걸음마다 테이프·헤드·상태가 완전히 똑같아지는 '순환'이에요.", 120],
+    ["1RB2LA1RA1RA_1LB1LA3RB1RZ", 2000, "halt", "함정! 멈춰요, 3,932,964걸음 뒤에. 상태 2개·기호 4개 챔피언(BB(2,4))이에요.", 200000],
+    ["1RB---_0RC1RB_1LC0LD_1RE1LE_0LF1LE_0RB1LF", 3000, "never", "영원히 안 멈춰요. 무작위 탐색에서 '이상해 보인다'고 표시했던 기계인데, n-gram CPS 판정기가 안 멈춤을 증명했어요.", 60000],
+    ["1RB2LB1RZ_2LA2RB1LB", 25, "halt", "멈춰요! 38걸음 만에. 상태 2개·기호 3개 챔피언이에요.", 38],
+  ];
+  let qi = 0, marks = [];
+  const order = Q.map((_, i) => i);
+  function dots() {
+    $("g2-dots").innerHTML = Q.map((_, i) => `<i class="${marks[i] || ""} ${i === qi ? "c" : ""}"></i>`).join("");
+    const right = marks.filter(m => m === "g").length, done = marks.filter(Boolean).length;
+    $("g2-num").textContent = qi < Q.length ? `문제 ${qi + 1} / ${Q.length} · 맞힌 수 ${right}` : `끝! ${done}문제 중 ${right}개 맞힘`;
+  }
+  function wide() { return Math.max(260, $("g2").clientWidth - 40); }
+  function ask() {
+    const [tm, show] = Q[order[qi]];
+    const res = run(parse(tm), show, 300);
+    $("g2-pics").innerHTML = `<figure><canvas id="g2-cv1"></canvas><figcaption>처음 ${show.toLocaleString()}걸음</figcaption></figure>`;
+    draw($("g2-cv1"), res, Math.min(wide(), 680));
+    $("g2-tm").textContent = tm;
+    $("g2-choices").hidden = false; $("g2-msg").hidden = true; $("g2-next").hidden = true;
+    dots();
+  }
+  $("g2-choices").querySelectorAll("button").forEach(b => b.onclick = () => {
+    const [tm, show, ans, text, more] = Q[order[qi]];
+    const pick = b.dataset.a;
+    const ok = ans === "unknown" ? null : pick === ans;
+    marks[qi] = ok === null ? "u" : ok ? "g" : "b";
+    const res = run(parse(tm), more, 300);
+    const half = wide() > 520;
+    const first = $("g2-pics").querySelector("figure").outerHTML;
+    $("g2-pics").innerHTML = first + `<figure><canvas id="g2-cv2"></canvas><figcaption>${res.halted ? `${res.step.toLocaleString()}걸음에 멈춤` : `처음 ${more.toLocaleString()}걸음`}</figcaption></figure>`;
+    draw($("g2-cv1"), run(parse(tm), show, 300), half ? wide() / 2 - 10 : wide());
+    draw($("g2-cv2"), res, half ? wide() / 2 - 10 : wide());
+    const m = $("g2-msg");
+    m.hidden = false;
+    m.className = "msg " + (ok === null ? "" : ok ? "good" : "bad");
+    m.innerHTML = `<p class="verdict">${ok === null ? "🤷 정답이 없는 문제" : ok ? "정답!" : "아쉬워요"}</p>${text}`;
+    $("g2-choices").hidden = true;
+    $("g2-next").hidden = false;
+    $("g2-next").textContent = qi + 1 < Q.length ? "다음 문제 →" : "처음부터 다시";
+    dots();
+  });
+  $("g2-next").onclick = () => {
+    qi++;
+    if (qi >= Q.length) { qi = 0; marks = []; }
+    ask();
+  };
+  ask();
+})();
+</script>
+</body>
+</html>

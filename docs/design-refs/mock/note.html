@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>연구 노트 시안</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #ffffff; --fg: #141414; --fg2: #3d3d3d; --muted: #8a8a8a; --line: #e8e8e8; --soft: #f7f7f5;
+  --accent: #ff5a1f; --hl: #ffe6d9; --blue: #635bff; --hlb: #e7e5ff;
+  --cell0: #f1f1f1; --cell1: #141414;
+  --sans: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", system-ui, sans-serif;
+  --mono: "Geist Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #0d0d0d; --fg: #ececec; --fg2: #c4c4c4; --muted: #8a8a8a; --line: #242424; --soft: #151515;
+    --hl: #3a2216; --hlb: #23214a; --cell0: #222; --cell1: #ececec; }
+}
+:root[data-theme="dark"] { --bg: #0d0d0d; --fg: #ececec; --fg2: #c4c4c4; --muted: #8a8a8a; --line: #242424; --soft: #151515;
+  --hl: #3a2216; --hlb: #23214a; --cell0: #222; --cell1: #ececec; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.8 var(--sans); -webkit-font-smoothing: antialiased; word-break: keep-all; }
+.page { max-width: 1180px; margin: 0 auto; padding: 0 28px 120px; display: grid; grid-template-columns: 190px minmax(0, 660px) 230px; gap: 0 44px; }
+.page > * { grid-column: 2; }
+.top { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; height: 60px; border-bottom: 1px solid var(--line);
+  font-size: .88rem; color: var(--muted); margin-bottom: 64px; }
+.top b { color: var(--fg); font-weight: 650; }
+.top a { color: inherit; text-decoration: none; margin-left: 20px; }
+.toc { grid-column: 1; grid-row: 2 / span 30; position: sticky; top: 28px; align-self: start; font-size: .86rem; line-height: 1.5; padding-top: 6px; }
+.toc p { font: 500 .72rem var(--mono); color: var(--muted); margin: 0 0 12px; letter-spacing: .04em; }
+.toc a { display: flex; gap: 10px; color: var(--muted); text-decoration: none; padding: 5px 0; }
+.toc a span { font-family: var(--mono); font-size: .75rem; }
+.toc a.on { color: var(--fg); font-weight: 600; }
+.kicker { font: 500 .78rem var(--mono); color: var(--accent); margin: 0 0 14px; letter-spacing: .02em; }
+h1 { font-size: 2.6rem; line-height: 1.18; letter-spacing: -.035em; margin: 0 0 14px; font-weight: 700; }
+.dek { font-size: 1.18rem; color: var(--fg2); margin: 0 0 22px; line-height: 1.6; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font: .8rem var(--mono); color: var(--muted); padding-bottom: 28px; border-bottom: 1px solid var(--line); margin: 0; }
+.tldr { margin: 32px 0 8px; padding: 20px 24px; background: var(--soft); border-radius: 12px; }
+.tldr p { margin: 0 0 8px; font: 600 .78rem var(--mono); color: var(--muted); letter-spacing: .04em; }
+.tldr ul { margin: 0; padding-left: 1.1em; color: var(--fg2); font-size: .98rem; line-height: 1.7; }
+.tldr b { color: var(--fg); }
+h2 { font-size: 1.7rem; letter-spacing: -.03em; line-height: 1.3; margin: 80px 0 8px; font-weight: 700; }
+h2 small { display: block; font: 500 .78rem var(--mono); color: var(--muted); letter-spacing: .02em; margin-bottom: 10px; }
+p { color: var(--fg2); margin: 16px 0; }
+p b { color: var(--fg); }
+mark { background: var(--hl); color: var(--fg); padding: 1px 4px; border-radius: 4px; }
+mark.b { background: var(--hlb); }
+code { font: .84em var(--mono); background: var(--soft); border: 1px solid var(--line); padding: 1px 5px; border-radius: 5px; }
+.side { grid-column: 3; font-size: .82rem; line-height: 1.6; color: var(--muted); margin: 0; align-self: start; border-left: 2px solid var(--line); padding-left: 14px; }
+.side b { color: var(--fg2); }
+.widget { margin: 28px 0; border: 1px solid var(--line); border-radius: 14px; padding: 20px; background: var(--bg); }
+.w-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font: 500 .75rem var(--mono); color: var(--muted); }
+.w-head b { color: var(--fg); font-family: var(--sans); font-size: .92rem; }
+.tape { display: grid; grid-template-columns: repeat(13, 1fr); gap: 4px; position: relative; padding-top: 30px; }
+.tape span { aspect-ratio: 1; border-radius: 6px; background: var(--cell0); display: flex; align-items: center; justify-content: center;
+  font: 500 .8rem var(--mono); color: var(--muted); transition: background .2s; }
+.tape span.one { background: var(--cell1); color: var(--bg); }
+.tape span.hd { box-shadow: 0 0 0 2px var(--accent); }
+.tape .badge { position: absolute; top: 0; height: 22px; padding: 0 8px; border-radius: 6px; background: var(--accent); color: #fff;
+  font: 600 .75rem/22px var(--mono); transform: translateX(-50%); transition: left .25s; white-space: nowrap; }
+.rules { display: grid; grid-template-columns: auto 1fr 1fr; gap: 6px; margin-top: 18px; font: .82rem var(--mono); align-items: center; }
+.rules div { padding: 8px 10px; border-radius: 8px; background: var(--soft); text-align: center; color: var(--fg2); }
+.rules .h { background: none; color: var(--muted); padding: 0 10px; font-size: .72rem; }
+.rules .on { background: var(--accent); color: #fff; }
+.say { margin: 16px 0 0; min-height: 3.4em; font-size: .95rem; color: var(--fg); }
+.say .n { font-family: var(--mono); color: var(--muted); margin-right: 8px; }
+.ctrl { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
+.ctrl button, .ctrl select { font: 600 .85rem var(--sans); height: 36px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); cursor: pointer; }
+.ctrl button.pri { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.ctrl .count { margin-left: auto; font: .8rem var(--mono); color: var(--muted); }
+.st { display: grid; grid-template-columns: 1fr; gap: 0; }
+.st canvas { width: 100%; height: auto; display: block; border-radius: 8px; background: var(--soft); image-rendering: pixelated; }
+figure.wide { grid-column: 2 / 4; margin: 36px 0; }
+figure.wide .img { background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 28px; }
+figure.wide img { width: 100%; display: block; image-rendering: pixelated; }
+figure.wide figcaption { font-size: .86rem; color: var(--muted); margin-top: 10px; max-width: 660px; }
+figure.wide figcaption b { color: var(--fg); }
+.next { margin-top: 56px; padding: 18px 22px; border: 1px dashed var(--line); border-radius: 12px; font-size: .92rem; color: var(--muted); }
+@media (max-width: 1080px) {
+  .page { grid-template-columns: minmax(0, 1fr); max-width: 720px; }
+  .page > *, .side, figure.wide, .toc { grid-column: 1; }
+  .toc { display: none; }
+  .side { border-left: 0; padding: 10px 14px; background: var(--soft); border-radius: 10px; margin: 4px 0 8px; }
+  .top { margin-bottom: 40px; }
+}
+@media (max-width: 560px) {
+  .page { padding: 0 18px 80px; }
+  h1 { font-size: 2rem; } body { font-size: 16px; }
+  .tape { grid-template-columns: repeat(9, 1fr); }
+  .tape span:nth-child(-n+2), .tape span:nth-last-child(-n+3) { display: none; }
+  figure.wide .img { padding: 14px; }
+  .widget { padding: 14px; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="top"><span><b>Busy Beaver</b> 연구 노트</span><span><a href="#">시뮬레이터</a><a href="#">데이터</a><a href="#">출처</a></span></div>
+
+  <nav class="toc"><p>목차</p>
+    <a class="on" href="#s1"><span>01</span>튜링 기계</a><a href="#"><span>02</span>직접 돌려 보기</a><a href="#"><span>03</span>BB(n)</a>
+    <a href="#"><span>04</span>크립티드</a><a href="#"><span>05</span>무작위 탐색</a><a href="#"><span>06</span>눈에 띄는 후보</a></nav>
+
+  <p class="kicker">연구 노트 · 2026년 10월 20일</p>
+  <h1>Busy Beaver 탐험기</h1>
+  <p class="dek">멈추는 작은 기계는 얼마나 오래 일할 수 있을까. 기계를 직접 한 걸음씩 돌려 보면서, 1,400만 개를 무작위로 시험한 결과까지 따라가 봅니다.</p>
+  <p class="meta"><span>읽는 데 약 10분</span><span>위젯 3개 · 시뮬레이터 1개</span><span>C·JS 시뮬레이터로 BB(5) 재현</span></p>
+
+  <div class="tldr"><p>요약</p><ul>
+    <li><b>BB(5) = 47,176,870걸음.</b> 2024년에 증명됐고, 이 노트의 시뮬레이터로 똑같이 재현했어요.</li>
+    <li>무작위로 만든 기계 <b>1,400만 개</b> 중 <b>420개</b>는 간단한 판정기로 결론이 안 났어요.</li>
+    <li>그중 <b>13개</b>는 10억 걸음까지 돌려도 멈추지 않았어요. 새로운 발견이라는 주장은 아닙니다.</li>
+  </ul></div>
+
+  <h2 id="s1"><small>01</small>튜링 기계는 이렇게 움직여요</h2>
+  <p>칸이 끝없이 이어진 <mark class="b">테이프</mark>가 있고, 그 위에서 <mark>헤드</mark> 하나가 한 칸씩 움직입니다. 헤드는 지금 자기 <b>상태</b>(A, B, …)와 발밑 칸의 기호를 보고, 규칙표에서 딱 한 줄을 골라 따라요.</p>
+  <p class="side"><b>표기법</b><br><code>1RB</code> = 1을 쓰고, 오른쪽(R)으로 한 칸, 상태 B로.<br><code>1RZ</code>의 Z는 멈춤.</p>
+
+  <div class="widget" id="w1">
+    <div class="w-head"><b>한 걸음씩 따라가기</b><span>BB(2) 챔피언 · 1RB1LB_1LA1RZ</span></div>
+    <div class="tape" id="w1-tape"></div>
+    <div class="rules" id="w1-rules"></div>
+    <p class="say" id="w1-say"></p>
+    <div class="ctrl"><button class="pri" id="w1-step">한 걸음 →</button><button id="w1-reset">처음으로</button><span class="count" id="w1-count"></span></div>
+  </div>
+
+  <p>여섯 걸음 만에 멈추죠. 상태가 2개인 기계 중에 <b>멈추면서</b> 이보다 오래 일하는 기계는 없습니다. 그래서 BB(2) = 6이에요.</p>
+
+  <h2><small>01 · 계속</small>걸음을 쌓으면 그림이 돼요</h2>
+  <p>매 걸음의 테이프를 한 줄로 찍고, 위에서 아래로 쌓으면 기계의 일생이 한 장의 그림이 됩니다. 이런 그림을 <b>시공간 다이어그램</b>이라고 불러요. 기계를 바꿔 가며 눌러 보세요.</p>
+  <p class="side">한 줄 = 한 순간의 테이프. <mark>주황</mark> 칸이 그때 헤드가 있던 자리예요.</p>
+
+  <div class="widget st" id="w2">
+    <div class="w-head"><b>시공간 다이어그램 만들기</b><span id="w2-name"></span></div>
+    <canvas id="w2-cv" width="440" height="220"></canvas>
+    <div class="ctrl"><select id="w2-sel"><option value="0">BB(2) · 6걸음</option><option value="1">BB(3) · 21걸음</option><option value="2" selected>BB(4) · 107걸음</option></select>
+      <button class="pri" id="w2-play">▶ 재생</button><button id="w2-reset">처음으로</button><span class="count" id="w2-count"></span></div>
+  </div>
+
+  <p>상태가 5개만 돼도 이야기가 완전히 달라집니다. BB(5) 챔피언은 <b>47,176,870걸음</b>을 일하고 멈춰요. 같은 방식으로 그리면 아래처럼 됩니다.</p>
+
+  <figure class="wide"><div class="img"><picture><source srcset="img/bb5_long_dark.png" media="(prefers-color-scheme: dark)"><img src="img/bb5_long.png" alt="BB(5) 챔피언의 실행 전체"></picture></div>
+    <figcaption><b>그림 1.</b> BB(5) 챔피언 <code>1RB1LC_1RC1RB_1RD0LE_1LA1LD_1RZ0LA</code>의 실행 전체. 테이프 폭이 12,289칸까지 넓어졌다가 멈춥니다. 다음 장의 시뮬레이터에서 직접 끝까지 돌려 볼 수 있어요.</figcaption></figure>
+
+  <div class="next">시안은 여기까지예요. 다음 장 <b>02 직접 돌려 보기</b>에는 지금 사이트의 전체 시뮬레이터가 이 위젯과 같은 모양으로 크게 들어갑니다.</div>
+</div>
+
+<script>
+(() => {
+  // Tiny TM engine for the mock (the real page uses web/stepper.js).
+  function parse(t) {
+    const parts = t.split("_"), m = parts[0].length / 3;
+    return { n: parts.length, m, r: parts.map(p => Array.from({ length: m }, (_, i) => p.slice(3 * i, 3 * i + 3))) };
+  }
+  const name = s => String.fromCharCode(65 + s);
+
+  // Widget 1: one step at a time, with the rule highlighted and explained.
+  const W1 = parse("1RB1LB_1LA1RZ");
+  let t1, h1, s1, n1, halted1;
+  const tapeEl = document.getElementById("w1-tape"), rulesEl = document.getElementById("w1-rules");
+  const sayEl = document.getElementById("w1-say"), cntEl = document.getElementById("w1-count");
+  function reset1() { t1 = {}; h1 = 0; s1 = 0; n1 = 0; halted1 = false; sayEl.innerHTML = '<span class="n">0</span>모든 칸이 0이고, 헤드는 상태 A에서 시작해요. <b>한 걸음</b>을 눌러 보세요.'; draw1(); }
+  function draw1(last) {
+    const R = 6; let html = "";
+    for (let x = h1 - R; x <= h1 + R; x++) html += `<span class="${t1[x] ? "one" : ""} ${x === h1 ? "hd" : ""}">${t1[x] || 0}</span>`;
+    tapeEl.innerHTML = html + `<em class="badge" style="left:${(R + 0.5) / (2 * R + 1) * 100}%">${halted1 ? "멈춤" : "상태 " + name(s1)}</em>`;
+    let r = '<div class="h"></div><div class="h">0을 읽으면</div><div class="h">1을 읽으면</div>';
+    for (let s = 0; s < W1.n; s++) {
+      r += `<div class="h">${name(s)}</div>`;
+      for (let k = 0; k < W1.m; k++) r += `<div class="${last && last[0] === s && last[1] === k ? "on" : ""}">${W1.r[s][k]}</div>`;
+    }
+    rulesEl.innerHTML = r;
+    cntEl.textContent = `${n1}걸음`;
+    document.getElementById("w1-step").disabled = halted1;
+  }
+  function step1() {
+    if (halted1) return;
+    const read = t1[h1] || 0, rule = W1.r[s1][read], from = s1;
+    const w = +rule[0], d = rule[1], ns = rule.charCodeAt(2) - 65;
+    t1[h1] = w; h1 += d === "R" ? 1 : -1; n1++;
+    const stop = ns >= W1.n;
+    sayEl.innerHTML = `<span class="n">${n1}</span>상태 <b>${name(from)}</b>에서 <b>${read}</b>을 읽었어요 → 규칙 <code>${rule}</code>: ${w}을 쓰고 ${d === "R" ? "오른쪽" : "왼쪽"}으로, ` +
+      (stop ? "<b>멈춤!</b> 6걸음 만에 끝났어요." : `상태 <b>${name(ns)}</b>로.`);
+    if (stop) halted1 = true; else s1 = ns;
+    draw1([from, read]);
+  }
+  document.getElementById("w1-step").onclick = step1;
+  document.getElementById("w1-reset").onclick = reset1;
+  reset1();
+
+  // Widget 2: the same steps stacked as rows -> space-time diagram.
+  const MS = [["1RB1LB_1LA1RZ", 6], ["1RB1RZ_1LB0RC_1LC1LA", 21], ["1RB1LB_1LA0LC_1RZ1LD_1RD0RA", 107]];
+  const cv = document.getElementById("w2-cv"), ctx = cv.getContext("2d"), sel = document.getElementById("w2-sel");
+  const playB = document.getElementById("w2-play"), cnt2 = document.getElementById("w2-count");
+  let M, rows, timer;
+  const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  function reset2() {
+    clearInterval(timer); timer = null; playB.textContent = "▶ 재생";
+    const [tm, total] = MS[+sel.value];
+    document.getElementById("w2-name").textContent = tm;
+    M = { m: parse(tm), t: {}, h: 0, s: 0, n: 0, done: false, total }; rows = [snap()]; draw2();
+  }
+  function snap() { return { t: { ...M.t }, h: M.h }; }
+  function step2() {
+    if (M.done) return;
+    const read = M.t[M.h] || 0, rule = M.m.r[M.s][read];
+    M.t[M.h] = +rule[0]; M.h += rule[1] === "R" ? 1 : -1; M.n++;
+    const ns = rule.charCodeAt(2) - 65;
+    if (ns >= M.m.n) M.done = true; else M.s = ns;
+    rows.push(snap());
+  }
+  function draw2() {
+    let lo = 0, hi = 0;
+    for (const r of rows) { lo = Math.min(lo, r.h, ...Object.keys(r.t).map(Number)); hi = Math.max(hi, r.h, ...Object.keys(r.t).map(Number)); }
+    const totalRows = M.total + 1, span = Math.max(hi - lo + 1, 8);
+    const c = Math.max(1, Math.min(Math.floor(cv.width / span), Math.floor(cv.height / totalRows) * 2, 26));
+    const rh = Math.max(1, Math.min(c, Math.floor(cv.height / totalRows)));
+    const x0 = Math.floor((cv.width - span * c) / 2) - (lo - Math.floor((span - (hi - lo + 1)) / 2)) * c;
+    ctx.fillStyle = css("--soft"); ctx.fillRect(0, 0, cv.width, cv.height);
+    const one = css("--cell1"), acc = css("--accent");
+    rows.forEach((r, y) => {
+      for (const k in r.t) if (r.t[k]) { ctx.fillStyle = one; ctx.fillRect(x0 + k * c, y * rh, c - (c > 4 ? 1 : 0), rh - (rh > 4 ? 1 : 0)); }
+      ctx.fillStyle = acc; ctx.fillRect(x0 + r.h * c, y * rh, c - (c > 4 ? 1 : 0), rh - (rh > 4 ? 1 : 0));
+    });
+    cnt2.textContent = M.done ? `${M.n}걸음 · 멈춤` : `${M.n}걸음`;
+  }
+  playB.onclick = () => {
+    if (timer) { clearInterval(timer); timer = null; playB.textContent = "▶ 재생"; return; }
+    if (M.done) reset2();
+    playB.textContent = "❚❚ 정지";
+    timer = setInterval(() => { step2(); draw2(); if (M.done) { clearInterval(timer); timer = null; playB.textContent = "▶ 다시"; } }, M.total > 50 ? 40 : 220);
+  };
+  document.getElementById("w2-reset").onclick = reset2;
+  sel.onchange = reset2;
+  reset2();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+random machines 3000: halting 1391, proved non-halting 1605, seen halting 1391
+halters proved: 0  cryptids proved: 0  leftovers proved: 5/15
+champion halters checked at 5 op limits: 7, proved: 0
+rules audited: 1743, failed audit: 0, skipped (instance > 6000 cells): 57
+UNSOUND: none
+exit 0

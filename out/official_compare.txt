@@ -1,0 +1,16 @@
+15 machines -> 15 distinct behaviours (first 200,000 steps)
+1x  1RB0RE_1LC1RA_1LD0LC_1LE1LF_1RB---_---0LD  ->  not in list
+1x  1RB1LE_1RC0RA_1RD1LA_1LA0RF_0LA0LB_---1RB  ->  not in list
+1x  1RB---_1RC1RB_0RD1LB_1LD1LE_0LA1RF_0LD0RF  ->  not in list
+1x  1RB0LA---4RB---_2LB3RB0RB1LA0LA  ->  not in list
+1x  1RB3RA2LB---1RA_2LA4LB1RB4LA1RB  ->  not in list
+1x  1RB3RB2RB3RA---_2LB3LA0RB4RA1LB  ->  not in list
+1x  1RB3RB3LB------_2LA4RA0LB1LB2LB  ->  not in list
+1x  1RB4LA4RA---1RB_2LB3RB0RB1LA2RA  ->  not in list
+1x  1RB------2LA---_2LB3RB0RB4LA1LB  ->  not in list
+1x  1RB---4LB2RA2RA_2LB3LA3LA4RA2RB  ->  not in list
+1x  1RB0LB3LA0LB---_2LA4RA3RB2RB2RA  ->  not in list
+1x  1RB2LA---------_2LB3LA0RB4LA3RB  ->  not in list
+1x  1RB2LA1LB4RA3LB_1LA---3RA3RB3LA  ->  not in list
+1x  1RB2LA3LA4RA1LA_1LA3RA1RB------  ->  not in list
+1x  1RB3LA4LA0LA---_2LA---3RA3RA1RB  ->  not in list

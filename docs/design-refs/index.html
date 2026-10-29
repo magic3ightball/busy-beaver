@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>그래프 무드 보드</title>
+<style>
+:root {
+  --bg: #f2f0eb; --fg: #1d1f24; --muted: #6a6e78; --card: #ffffff; --line: #dedad0;
+  --chip: #e7e3d9; --accent: #e0661b; --shadow: 0 1px 2px rgba(0,0,0,.06), 0 6px 18px rgba(0,0,0,.05);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111317; --fg: #e8e6e0; --muted: #9a9ea8; --card: #1a1d23; --line: #2b2f38;
+    --chip: #242831; --accent: #ff9147; --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111317; --fg: #e8e6e0; --muted: #9a9ea8; --card: #1a1d23; --line: #2b2f38;
+  --chip: #242831; --accent: #ff9147; --shadow: none;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg);
+  font: 15px/1.65 -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 32px 20px 120px; }
+header h1 { font-size: 1.9rem; line-height: 1.25; margin: 0 0 6px; letter-spacing: -.01em; }
+header p { color: var(--muted); margin: 4px 0; max-width: 760px; }
+nav { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(8px); padding: 10px 0; margin: 18px 0 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+nav a { text-decoration: none; color: var(--fg); background: var(--chip); padding: 5px 12px;
+  border-radius: 999px; font-size: .9rem; display: inline-flex; align-items: center; gap: 6px; }
+nav a i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+section { margin-top: 56px; scroll-margin-top: 60px; }
+.mood-head { display: grid; grid-template-columns: 1fr auto; gap: 8px 24px; align-items: end;
+  border-top: 1px solid var(--line); padding-top: 22px; }
+.mood-head h2 { margin: 0; font-size: 1.45rem; }
+.mood-head .en { color: var(--muted); font-size: .85rem; font-weight: 400; margin-left: 8px; letter-spacing: .04em; }
+.mood-head p { grid-column: 1 / -1; margin: 0; color: var(--muted); max-width: 820px; }
+.swatches { display: flex; gap: 4px; }
+.swatches span { width: 34px; height: 34px; border-radius: 6px; border: 1px solid rgba(0,0,0,.08);
+  font-size: 9px; display: flex; align-items: flex-end; justify-content: center; color: rgba(0,0,0,.45); padding-bottom: 2px; }
+.ours { display: grid; grid-template-columns: 1fr 1.6fr 1.2fr; gap: 14px; margin: 18px 0 10px; align-items: stretch; }
+.ours figure, .ours .note { margin: 0; background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow);
+  border: 1px solid var(--line); }
+.ours img { width: 100%; height: 100%; max-height: 300px; object-fit: cover; display: block; cursor: zoom-in; }
+.ours .note { padding: 14px 16px; font-size: .9rem; }
+.ours .note b { display: block; font-size: .78rem; letter-spacing: .06em; color: var(--muted); font-weight: 600; margin-bottom: 4px; }
+.ours .note ul { margin: 6px 0 0; padding-left: 18px; }
+.ours .note .tag { display: inline-block; font-size: .78rem; background: var(--chip); border-radius: 4px; padding: 0 6px; margin: 2px 2px 0 0; }
+.grid { columns: 3 300px; column-gap: 14px; margin-top: 14px; }
+.card { break-inside: avoid; margin: 0 0 14px; background: var(--card); border: 1px solid var(--line);
+  border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); position: relative; }
+.card img { width: 100%; min-height: 140px; display: block; cursor: zoom-in; background: var(--chip); }
+.card .body { padding: 10px 14px 12px; }
+.card h3 { font-size: .98rem; margin: 0; line-height: 1.35; }
+.card .by { font-size: .8rem; color: var(--muted); margin: 2px 0 6px; }
+.card .by a { color: inherit; }
+.card .take { font-size: .86rem; margin: 0; }
+.card .id { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,.6); color: #fff; font: 600 11px/1 ui-monospace, Menlo, monospace;
+  padding: 4px 6px; border-radius: 4px; }
+.heart { position: absolute; top: 6px; right: 6px; width: 34px; height: 34px; border-radius: 50%; border: 0;
+  background: rgba(255,255,255,.9); cursor: pointer; font-size: 17px; line-height: 34px; color: #b8b2a6; box-shadow: 0 1px 4px rgba(0,0,0,.2); }
+.heart[aria-pressed="true"] { color: #e0365b; }
+.picked { position: fixed; left: 50%; transform: translateX(-50%); bottom: 16px; z-index: 9; background: var(--fg); color: var(--bg);
+  border-radius: 999px; padding: 8px 10px 8px 18px; display: none; align-items: center; gap: 12px; box-shadow: 0 6px 24px rgba(0,0,0,.25);
+  max-width: calc(100vw - 32px); font-size: .9rem; }
+.picked.on { display: flex; }
+.picked code { font: 12px ui-monospace, Menlo, monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 52vw; }
+.picked button { border: 0; border-radius: 999px; padding: 6px 12px; background: var(--accent); color: #fff; cursor: pointer; font-size: .85rem; }
+.lb { position: fixed; inset: 0; background: rgba(0,0,0,.86); display: none; align-items: center; justify-content: center; z-index: 20; padding: 24px; cursor: zoom-out; }
+.lb.on { display: flex; }
+.lb img { max-width: 100%; max-height: 92vh; border-radius: 6px; }
+footer { margin-top: 72px; border-top: 1px solid var(--line); padding-top: 18px; color: var(--muted); font-size: .85rem; }
+footer a { color: inherit; }
+@media (max-width: 760px) {
+  .ours { grid-template-columns: 1fr 1fr; }
+  .ours .note { grid-column: 1 / -1; }
+  .mood-head { grid-template-columns: 1fr; }
+  .swatches span { width: 28px; height: 28px; }
+  header h1 { font-size: 1.5rem; }
+  nav { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  nav a { white-space: nowrap; flex: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Busy Beaver 그래프 무드 보드</h1>
+  <p>사이트와 기계 그림(시공간 다이어그램)을 더 아름답게 바꾸기 위한 레퍼런스예요. 무드 6가지로 나눴고, 각 무드마다 <b>우리 그래프에 그 색을 입혀 본 시안</b>을 맨 앞에 두었습니다.</p>
+  <p>마음에 드는 카드는 ♥를 누르세요. 아래에 나오는 번호 목록을 복사해 채팅에 붙여 주면 그 방향으로 고칠게요. 사진을 누르면 크게 볼 수 있어요.</p>
+</header>
+<nav id="nav"></nav>
+<main id="main"></main>
+<footer>
+  <p>이미지는 2026-10-20에 각 출처 페이지에서 캡처하거나 내려받은 개인 참고용 사본입니다. 저작권은 각 작가와 기관에 있어요. 이 폴더(<code>docs/design-refs</code>)는 배포하는 <code>web/</code>에 들어가지 않습니다. 오래된 도판(Du Bois, Minard, Playfair, Nightingale, Willard, Haeckel)과 Rule 30 그림은 Wikimedia Commons에서 가져왔고, Gaia 지도는 ESA/Gaia/DPAC(CC BY-SA 3.0 IGO), 온난화 줄무늬는 Ed Hawkins(CC BY 4.0) 작품입니다.</p>
+  <p>시안 그림은 <code>python3 docs/design-refs/moods.py</code>로 다시 만들 수 있어요(색은 그 파일의 MOODS에 있습니다).</p>
+</footer>
+</div>
+<div class="picked" id="picked"><span>고른 것</span><code id="pickedList"></code><button id="copy" type="button">복사</button></div>
+<div class="lb" id="lb"><img alt=""></div>
+<script>
+const MOODS = [
+ { key: "mono", name: "흑백 판화 · 계산 노트", en: "MONOCHROME LAB NOTES", dot: "#1b1b1b",
+   desc: "종이색 바탕에 잉크 몇 가지 농도만. 규칙이 만든 무늬를 꾸미지 않고 그대로 보여 줍니다. Wolfram의 NKS 책과 Tufte 계열이에요.",
+   sw: ["#f3efe6", "#1b1b1b", "#5a5a5a", "#9a9a9a", "#c9c5bb", "#c8102e"],
+   good: ["기호가 많아도 차분함", "인쇄해도 그대로", "헤드(빨강)만 강조돼 눈길이 모임"],
+   bad: ["기호 5개를 회색 농도로만 구분하면 3·4번이 헷갈림"],
+   type: ["세리프 제목 + 고정폭 숫자"] },
+ { key: "night", name: "깊은 밤 · 관측소", en: "DEEP NIGHT OBSERVATORY", dot: "#7fd4ff",
+   desc: "짙은 남색 바탕에 차가운 빛. 천문 자료나 망원경 사진처럼 '어둠 속에서 무언가 자라는' 느낌. 지금 사이트의 검은 그림과 가장 가까워요.",
+   sw: ["#070b1e", "#7fd4ff", "#b48cff", "#ff7ac6", "#ffe08a", "#ffffff"],
+   good: ["지금 그림에서 가장 적게 바꿔도 됨", "넓게 퍼지는 기계가 별자리처럼 보임"],
+   bad: ["밝은 페이지 위에서는 그림만 무겁게 떠 보일 수 있음"],
+   type: ["가는 산세리프, 넓은 자간의 작은 영문 라벨"] },
+ { key: "editorial", name: "따뜻한 종이 · 설명형 기사", en: "WARM PAPER EXPLAINER", dot: "#d1495b",
+   desc: "여백이 많고, 그림이 글 사이에서 설명을 돕는 방식. Distill, Ciechanowski, Our World in Data 같은 해설 기사 계열이에요.",
+   sw: ["#fbf7ef", "#2b4c7e", "#d1495b", "#edae49", "#66a182", "#111111"],
+   good: ["글과 그림이 한 흐름으로 읽힘", "색 4개가 서로 잘 구분됨"],
+   bad: ["그림 자체의 '와!' 하는 맛은 덜함"],
+   type: ["본문 세리프 또는 편한 산세리프, 그림 옆 주석"] },
+ { key: "vintage", name: "빈티지 과학 도판", en: "VINTAGE SCIENCE PLATES", dot: "#d72638",
+   desc: "1800~1900년대 손으로 그린 통계 도판. 바랜 종이, 진한 빨강·남색·금색. Du Bois의 1900년 파리 박람회 도표가 대표적이에요.",
+   sw: ["#e9dcc3", "#d72638", "#1b3a6b", "#f2b705", "#e8a0a8", "#111111"],
+   good: ["'수학의 미해결 문제'라는 이야기와 잘 맞음", "색이 진해서 기호 구분이 쉬움"],
+   bad: ["종이 질감·가장자리 그늘을 과하게 넣으면 흐려 보임"],
+   type: ["클래식 세리프, 대문자 제목"] },
+ { key: "pastel", name: "손그림 · 파스텔", en: "HAND-DRAWN PASTEL", dot: "#f4a3bd",
+   desc: "손으로 그린 듯한 선, 부드러운 파스텔, 리소 인쇄처럼 살짝 어긋난 색. Giorgia Lupi와 Dear Data 계열이에요.",
+   sw: ["#fff9f2", "#f4a3bd", "#9fd3e6", "#ffd29d", "#bfe6b8", "#ff5d73"],
+   good: ["어려운 주제가 친근해 보임", "카드·엽서처럼 모아 보기 좋음"],
+   bad: ["연한 색끼리 대비가 낮아 큰 그림은 흐릿함 (시안 참고)"],
+   type: ["둥근 산세리프, 손글씨 느낌 라벨"] },
+ { key: "neon", name: "네온 · 제너러티브", en: "NEON & GENERATIVE", dot: "#fe53bb",
+   desc: "어두운 보라 바탕에 빛나는 형광색. 제너러티브 아트·인공 생명 시뮬레이션 계열이에요. 가장 화려합니다.",
+   sw: ["#0d0221", "#08f7fe", "#fe53bb", "#f5d300", "#00ff9f", "#ffffff"],
+   good: ["한눈에 시선을 끔", "기호 구분이 가장 확실함"],
+   bad: ["글이 많은 설명 페이지와는 따로 놀 수 있음", "오래 보면 눈이 피곤함"],
+   type: ["기하학 산세리프, 고정폭 코드"] },
+];
+const REFS = {
+ mono: [
+  ["rule30", "Rule 30, 2,000세대", "Wikimedia Commons", "https://commons.wikimedia.org/wiki/File:Rule_30_2000Generations.png", "흑백 두 값만으로도 충분히 아름다워요. 우리 BB(2) 그림과 같은 언어."],
+  ["wolfram-pnp", "P vs NP 글의 작은 그래프 묶음", "Stephen Wolfram", "https://writings.stephenwolfram.com/2026/01/p-vs-np-and-the-difficulty-of-computation-a-ruliological-approach/", "같은 크기 작은 그림을 격자로 늘어놓기(스몰 멀티플). 연한 파랑 한 색."],
+  ["wolfram-ruliology-social", "What Is Ruliology?", "Stephen Wolfram", "https://writings.stephenwolfram.com/2026/01/what-is-ruliology/", "실험 노트처럼 수십 개 썸네일 + 세리프 제목. 우리 '홀드아웃 갤러리'에 그대로 쓸 수 있는 구성."],
+  ["tufte-sparkline", "Sparkline theory and practice", "Edward Tufte", "https://www.edwardtufte.com/notebook/sparkline-theory-and-practice-edward-tufte/", "글 줄 안에 들어가는 아주 작은 그래프. 폭 성장 곡선을 숫자 옆에 붙이는 아이디어."],
+  ["inconvergent-sand", "Grains of Sand", "Anders Hoff (inconvergent)", "https://inconvergent.net/2017/grains-of-sand/", "얇은 선이 수없이 쌓여 생기는 질감. 1억 걸음 그림을 '밀도'로 그리는 방식의 힌트."],
+ ],
+ night: [
+  ["wolfram-bugs", "Towards a Theory of Bugs", "Stephen Wolfram", "https://writings.stephenwolfram.com/2026/07/towards-a-theory-of-bugs-the-ruliology-of-the-unexpected/", "짙은 회색 바탕 + 주황 하나로 튜링 기계 실행을 보여 줘요. 우리 그림과 구조가 거의 같아요."],
+  ["wolfram-pnp-hero", "P vs NP 표지 그림", "Stephen Wolfram", "https://writings.stephenwolfram.com/2026/01/p-vs-np-and-the-difficulty-of-computation-a-ruliological-approach/", "규칙표·그래프·다이어그램을 한 판에 모은 구성. 히어로 이미지 아이디어."],
+  ["gaia", "Gaia’s sky in colour", "ESA/Gaia/DPAC · CC BY-SA 3.0 IGO", "https://commons.wikimedia.org/wiki/File:Gaia%E2%80%99s_sky_in_colour_ESA393127.jpg", "검은 바탕 위 빛나는 점의 밀도. 아주 긴 실행을 '밝기'로 압축하는 느낌."],
+  ["vc-hubble", "Hubble", "Nadieh Bremer", "https://www.visualcinnamon.com/portfolio/hubble-30-years/", "짙은 남색 + 금색 포인트, 원형 배치. 포스터 한 장에 정보가 많아도 정돈돼 보여요."],
+  ["vc-gw", "Gravitational Waves", "Nadieh Bremer", "https://www.visualcinnamon.com/portfolio/gravitational-waves/", "세로로 긴 포스터. 어둠 속 가는 선과 작은 점."],
+ ],
+ editorial: [
+  ["ciechanowski-watch", "Mechanical Watch", "Bartosz Ciechanowski", "https://ciechanow.ski/mechanical-watch/", "넓은 여백, 본문 사이에 직접 돌려 볼 수 있는 그림. 나중에 만들 '한 걸음씩 실행기'의 좋은 본보기."],
+  ["bostock-algorithms", "Visualizing Algorithms", "Mike Bostock", "https://bost.ocks.org/mike/algorithms/", "알고리즘을 걸음마다 그림으로 보여 줘요. 설명과 그림이 번갈아 나오는 리듬."],
+  ["distill-gnn", "A Gentle Introduction to Graph Neural Networks", "Distill", "https://distill.pub/2021/gnn-intro/", "흰 종이 + 작은 색점, 그림 바로 옆 짧은 설명."],
+  ["owid", "Life expectancy", "Our World in Data", "https://ourworldindata.org/grapher/life-expectancy", "범례 대신 선 끝에 이름을 바로 써요. 우리 퍼널 표를 차트로 바꿀 때 참고."],
+  ["stripes", "Warming stripes", "Ed Hawkins · CC BY 4.0", "https://showyourstripes.info/", "띠 한 줄로 170년을 보여 줘요. 테이프 한 줄 = 한 순간인 우리 그림과 같은 원리."],
+  ["vc-breathing", "Breathing Earth", "Nadieh Bremer", "https://www.visualcinnamon.com/portfolio/breathing-earth/", "한 가지 색의 진하기만으로 변화를 보여 줘요."],
+ ],
+ vintage: [
+  ["dubois-school", "흑인 학교 등록 학생 수 (1900 파리 박람회)", "W.E.B. Du Bois · Wikimedia Commons", "https://commons.wikimedia.org/wiki/File:WEB_Du_Bois_1900_Paris_Chart_School_Enrollment.jpg", "바랜 종이 위 굵은 막대. 큰 숫자를 손글씨로 바로 옆에."],
+  ["minard", "나폴레옹의 러시아 원정", "Charles Minard (1869)", "https://commons.wikimedia.org/wiki/File:Minard.png", "띠의 두께로 양을 보여 주는 고전. 테이프 폭 변화를 이렇게 그릴 수도 있어요."],
+  ["playfair", "덴마크·노르웨이 무역 수지", "William Playfair (1786)", "https://commons.wikimedia.org/wiki/File:Playfair_TimeSeries.png", "손으로 칠한 면과 촘촘한 눈금선. 축과 눈금을 '장식'처럼 쓰는 법."],
+  ["nightingale", "동부 전선 군인 사망 원인 도표", "Florence Nightingale (1858)", "https://commons.wikimedia.org/wiki/File:Nightingale-mortality.jpg", "옅은 파랑·분홍·검정만으로 만든 원형 도표."],
+  ["willard", "Temple of Time", "Emma Willard (1846)", "https://commons.wikimedia.org/wiki/File:Temple_of_Time_(1846)_Emma_Willard.jpg", "시간을 원근 있는 건물로. 걸음 수가 깊이로 들어가는 그림 아이디어."],
+  ["haeckel", "Kunstformen der Natur — Discoidea", "Ernst Haeckel (1904)", "https://commons.wikimedia.org/wiki/File:Haeckel_Discoidea.jpg", "발견한 '생물'을 도감처럼 한 장에 모으기. 홀드아웃 도감 레이아웃."],
+ ],
+ pastel: [
+  ["dearData", "Dear Data", "Giorgia Lupi · Stefanie Posavec", "https://www.dear-data.com/all", "1년 동안 주고받은 손그림 데이터 엽서. 범례도 손글씨."],
+  ["lupi-home", "Long Covid 데이터 작업", "Giorgia Lupi", "https://giorgialupi.com/", "붓 자국 같은 색 띠. 딱딱한 데이터를 따뜻하게."],
+  ["lupi-1374", "1,374 Days (NYT 오피니언)", "Giorgia Lupi", "https://giorgialupi.com/1374-days-nyt-visual-oped", "날마다 하나씩 쌓이는 색 조각. 걸음마다 쌓이는 우리 그림과 닮았어요."],
+  ["lupi-subway", "A Data Love Letter to the Subway", "Giorgia Lupi", "https://giorgialupi.com/a-data-love-letter-to-the-subway", "굵은 곡선 띠를 벽 크기로. 그림을 '설치 작품'처럼 크게 보여 주기."],
+  ["roughjs", "Rough.js", "Preet Shihn", "https://roughjs.com/", "손그림 느낌을 코드로 내는 라이브러리. 이 방향이면 바로 쓸 수 있는 도구."],
+  ["vc-magic", "Magic is Everywhere", "Nadieh Bremer", "https://www.visualcinnamon.com/portfolio/magic/", "수채 번짐 같은 파스텔 원들."],
+  ["vc-exoplanet", "Meet the Neighbors (Scientific American)", "Nadieh Bremer", "https://www.visualcinnamon.com/portfolio/exoplanet-neighbors/", "인쇄 지면 위 색점. 크림색 종이와 파스텔의 조합."],
+ ],
+ neon: [
+  ["mplcyberpunk", "mplcyberpunk", "Dominik Haitz", "https://github.com/dhaitz/mplcyberpunk", "형광 선 + 아래로 번지는 빛. 파이썬 그래프에 바로 씌우는 스타일."],
+  ["lenia", "Lenia", "Bert Chan", "https://chakazul.github.io/lenia.html", "검은 바탕의 무지개 인공 생명. 같은 '발견' 이야기를 하는 사이트."],
+  ["distill-growingca", "Growing Neural Cellular Automata", "Mordvintsev et al. · Distill", "https://distill.pub/2020/growing-ca/", "픽셀을 숨기지 않고 크게 보여 줘서 오히려 귀여워요."],
+  ["vc-flights", "A Year in Flights", "Nadieh Bremer", "https://www.visualcinnamon.com/portfolio/a-year-in-flights/", "검은 바탕 위 작은 그림 격자. 홀드아웃 수백 개를 한 화면에."],
+  ["fidenza", "Fidenza", "Tyler Hobbs", "https://www.tylerxhobbs.com/works/fidenza", "정해 둔 팔레트 안에서만 색을 고르는 제너러티브 아트. 팔레트 규칙 만들기 참고."],
+ ],
+};
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+let picked = [];
+try { picked = JSON.parse(localStorage.getItem("bb-moodboard-picks") || "[]"); } catch (e) { picked = []; }
+const save = () => { try { localStorage.setItem("bb-moodboard-picks", JSON.stringify(picked)); } catch (e) {} };
+$("#nav").innerHTML = MOODS.map(m => `<a href="#${m.key}"><i style="background:${m.dot}"></i>${esc(m.name)}</a>`).join("");
+$("#main").innerHTML = MOODS.map((m, mi) => {
+  const cards = REFS[m.key].map((r, j) => {
+    const id = `${mi + 1}-${j + 1}`;
+    return `<article class="card" data-id="${id}" data-title="${esc(r[1])}">
+      <span class="id">${id}</span>
+      <button class="heart" type="button" aria-pressed="false" aria-label="${esc(r[1])} 고르기">♥</button>
+      <img src="img/${r[0]}.jpg" alt="${esc(r[1])}" loading="lazy">
+      <div class="body"><h3>${esc(r[1])}</h3><p class="by"><a href="${r[3]}" target="_blank" rel="noopener">${esc(r[2])} ↗</a></p><p class="take">${esc(r[4])}</p></div>
+    </article>`;
+  }).join("");
+  return `<section id="${m.key}">
+    <div class="mood-head"><h2>${mi + 1}. ${esc(m.name)}<span class="en">${m.en}</span></h2>
+      <div class="swatches">${m.sw.map((c, i) => `<span style="background:${c}" title="${c}">${i === 0 ? "바탕" : i === m.sw.length - 1 ? "헤드" : ""}</span>`).join("")}</div>
+      <p>${esc(m.desc)}</p></div>
+    <div class="ours">
+      <figure><img src="img/mood-${m.key}-a.png" alt="우리 그래프 시안: 자기유사 기계"></figure>
+      <figure><img src="img/mood-${m.key}-b.png" alt="우리 그래프 시안: 격자 부채꼴 기계"></figure>
+      <div class="note"><b>우리 그래프에 입히면</b>
+        <ul>${m.good.map(g => `<li>${esc(g)}</li>`).join("")}${m.bad.map(g => `<li style="color:var(--muted)">주의: ${esc(g)}</li>`).join("")}</ul>
+        <div style="margin-top:8px">${m.type.map(t => `<span class="tag">글꼴: ${esc(t)}</span>`).join("")}</div>
+        <button class="heart" type="button" aria-pressed="false" data-mood="${mi + 1}" style="position:static;margin-top:10px;width:auto;padding:0 12px;border-radius:999px;font-size:.85rem;line-height:30px;height:30px" aria-label="이 무드 고르기">♥ 이 무드</button>
+      </div>
+    </div>
+    <div class="grid">${cards}</div>
+  </section>`;
+}).join("");
+function keyOf(btn) { return btn.dataset.mood ? `무드${btn.dataset.mood}` : btn.closest(".card").dataset.id; }
+function sync() {
+  document.querySelectorAll(".heart").forEach(b => b.setAttribute("aria-pressed", picked.includes(keyOf(b)) ? "true" : "false"));
+  $("#picked").classList.toggle("on", picked.length > 0);
+  $("#pickedList").textContent = picked.join(", ");
+}
+document.addEventListener("click", e => {
+  const h = e.target.closest(".heart");
+  if (h) { const k = keyOf(h); picked = picked.includes(k) ? picked.filter(x => x !== k) : [...picked, k]; save(); sync(); return; }
+  const img = e.target.closest(".card img, .ours img");
+  if (img) { $("#lb img").src = img.src; $("#lb").classList.add("on"); return; }
+  if (e.target.closest("#lb")) $("#lb").classList.remove("on");
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape") $("#lb").classList.remove("on"); });
+$("#copy").addEventListener("click", async () => {
+  const text = "무드 보드에서 고른 것: " + picked.map(k => {
+    const c = document.querySelector(`.card[data-id="${k}"]`); return c ? `${k} ${c.dataset.title}` : k;
+  }).join(", ");
+  try { await navigator.clipboard.writeText(text); $("#copy").textContent = "복사됨"; } catch (e) { prompt("복사해 주세요", text); }
+  setTimeout(() => $("#copy").textContent = "복사", 1500);
+});
+sync();
+</script>
+</body>
+</html>
